@@ -1,0 +1,10 @@
+.projects h3 {
+  background-color: #ddd;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.projects p {
+  padding-left: 20%;
+  padding-right: 20%;
+}
