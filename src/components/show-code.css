@@ -11,9 +11,10 @@
   max-width: 40%;
   top: 60px;
   left: 40px;
-  white-space: pre-wrap;  
+  white-space: pre-wrap;
   white-space: -moz-pre-wrap;
   white-space: -pre-wrap;
   white-space: -o-pre-wrap;
   word-wrap: break-word;
+  z-index: -1;
 }

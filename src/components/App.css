@@ -5,6 +5,8 @@
 
 .App {
   text-align: center;
+  background-color: white;
+  mix-blend-mode: auto;
 }
 
 .floater {
@@ -20,8 +22,6 @@
   background-color: #222;
   padding: 20px;
   color: white;
-  position: relative;
-  z-index: -1;
 }
 
 .header h2 {

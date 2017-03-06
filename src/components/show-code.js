@@ -3,18 +3,19 @@ import jsxToString from 'jsx-to-string';
 
 import './show-code.css';
 
-const ShowCode = ({ jsx }) => (
-  <pre className="codeblock" onLoad={() => { document.body.style.opacity = '1'; }}>
-    {jsxToString(jsx, { showCode: true })}
+const ShowCode = ({ children }) => (
+  <pre className="codeblock">
+    {jsxToString(children, { showCode: true })}
   </pre>
 );
 
 ShowCode.defaultProps = {
-  jsx: null,
+  children: null,
 };
 
 ShowCode.propTypes = {
-  jsx: React.PropTypes.element,
+  children: React.PropTypes.element,
+  // children: React.PropTypes.node.isRequired,
 };
 
 export default ShowCode;

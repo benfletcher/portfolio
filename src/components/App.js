@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+// import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import ShowCode from './show-code';
 import './App.css';
@@ -10,78 +10,70 @@ class App extends Component {
     super();
 
     this.state = {
-      key: null,
       reveal: false,
-      clientX: null,
-      clientY: null,
-      floaterSize: 100,
+      clientX: 0,
+      clientY: 0,
+      floatSize: 100,
+      viewX: window.innerWidth,
+      viewY: window.innerHeight,
     };
 
-    this.keyDown = this.keyDown.bind(this);
-    this.keyUp = this.keyUp.bind(this);
     this.keyPress = this.keyPress.bind(this);
-    this.mouseMove = this.mouseMove.bind(this);
     this.wheel = this.wheel.bind(this);
   }
 
   componentWillMount() {
-    document.addEventListener('keypress', this.keyPress, { capture: true });
-    document.addEventListener('keydown', this.keyDown, { capture: true });
-    document.addEventListener('keyup', this.keyUp, { capture: true });
-    document.addEventListener('pointermove', this.mouseMove, { capture: true });
-    document.addEventListener('pointerdown', this.touchStart, { capture: true });
-    document.addEventListener('wheel', this.wheel, { capture: true });
-  }
-
-  componentDidMount() {
-
-  }
-
-  keyDown({ key }) {
-    if (key === 'Control') {
-      this.setState({ key, reveal: true });
-    }
-  }
-
-  keyUp({ key }) {
-    if (key === 'Control') {
-      this.setState({ key: null, reveal: false });
-    }
+    window.addEventListener('keypress', this.keyPress, { capture: true });
+    window.addEventListener('pointermove', ({ clientX, clientY }) =>
+      this.setState({
+        clientX,
+        clientY,
+      }),
+    );
+    window.addEventListener('wheel', this.wheel);
+    window.addEventListener('resize', () =>
+      this.setState({
+        viewX: window.innerWidth,
+        viewY: window.innerHeight,
+      }),
+    );
   }
 
   keyPress({ key }) {
     if (key === 'z' || key === 'Z') {
-      this.setState({ key, reveal: !this.state.reveal });
+      this.setState({ reveal: !this.state.reveal });
     }
   }
 
-  mouseMove({ clientX, clientY }) {
-    this.setState({
-      clientX,
-      clientY,
-    });
-  }
-
   wheel(e) {
-    if (e.ctrlKey) {
+    if (e.ctrlKey && e.deltaY) {
       e.preventDefault();
-      if (e.deltaY < 0 && this.state.floaterSize < 400) {
-        this.setState({ floaterSize: this.state.floaterSize + 6 });
-      } else if (e.deltaY > 0 && this.state.floaterSize > 6) {
-        this.setState({ floaterSize: this.state.floaterSize - 6 });
-      }
+
+      let newSize = this.state.floatSize;
+      newSize += (e.deltaY < 0) ? 6 : -6;
+      newSize = Math.min(Math.max(newSize, 0), 500);
+
+      this.setState({ floatSize: newSize });
     }
   }
 
   render() {
+    const half = this.state.floatSize / 2;
+
+    const floatX = Math.min(Math.max(this.state.clientX - half, 0),
+        this.state.viewX - this.state.floatSize);
+
+    const floatY = Math.min(Math.max(this.state.clientY - half, 0),
+        this.state.viewY - this.state.floatSize);
+
     const componentContent = (
       <div className="App">
         <div
           className="floater" style={{
-            left: this.state.clientX - (this.state.floaterSize / 2),
-            top: this.state.clientY - (this.state.floaterSize / 2),
-            width: `${this.state.floaterSize}px`,
-            height: `${this.state.floaterSize}px`,
+            left: floatX,
+            top: floatY,
+            width: `${this.state.floatSize}px`,
+            height: `${this.state.floatSize}px`,
           }}
         />
         <div className="header">
@@ -98,15 +90,9 @@ class App extends Component {
 
     return (
       <div>
-        <ReactCSSTransitionGroup
-          component="div"
-          className="showcode"
-          transitionName="showcode"
-          transitionEnterTimeout={500}
-          transitionLeaveTimeout={300}
-        >
-          {this.state.reveal ? <ShowCode jsx={componentContent} /> : null}
-        </ReactCSSTransitionGroup>
+        <ShowCode>
+          {componentContent}
+        </ShowCode>
         {componentContent}
       </div>
 
