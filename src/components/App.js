@@ -14,19 +14,27 @@ class App extends Component {
       reveal: false,
       clientX: null,
       clientY: null,
+      floaterSize: 100,
     };
 
     this.keyDown = this.keyDown.bind(this);
     this.keyUp = this.keyUp.bind(this);
     this.keyPress = this.keyPress.bind(this);
     this.mouseMove = this.mouseMove.bind(this);
+    this.wheel = this.wheel.bind(this);
   }
 
   componentWillMount() {
     document.addEventListener('keypress', this.keyPress, { capture: true });
     document.addEventListener('keydown', this.keyDown, { capture: true });
     document.addEventListener('keyup', this.keyUp, { capture: true });
-    document.addEventListener('mousemove', this.mouseMove);
+    document.addEventListener('pointermove', this.mouseMove, { capture: true });
+    document.addEventListener('pointerdown', this.touchStart, { capture: true });
+    document.addEventListener('wheel', this.wheel, { capture: true });
+  }
+
+  componentDidMount() {
+
   }
 
   keyDown({ key }) {
@@ -54,9 +62,28 @@ class App extends Component {
     });
   }
 
+  wheel(e) {
+    if (e.ctrlKey) {
+      e.preventDefault();
+      if (e.deltaY < 0 && this.state.floaterSize < 400) {
+        this.setState({ floaterSize: this.state.floaterSize + 6 });
+      } else if (e.deltaY > 0 && this.state.floaterSize > 6) {
+        this.setState({ floaterSize: this.state.floaterSize - 6 });
+      }
+    }
+  }
+
   render() {
     const componentContent = (
       <div className="App">
+        <div
+          className="floater" style={{
+            left: this.state.clientX - (this.state.floaterSize / 2),
+            top: this.state.clientY - (this.state.floaterSize / 2),
+            width: `${this.state.floaterSize}px`,
+            height: `${this.state.floaterSize}px`,
+          }}
+        />
         <div className="header">
           <h2>ben fletcher</h2>
           <h3>developer</h3>
